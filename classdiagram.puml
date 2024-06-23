@@ -1,0 +1,115 @@
+@startuml
+
+package "Main Application" {
+    class Main {
+        - Connection connection
+        + main(String[] args)
+    }
+
+    class Translator {
+        - String key
+        - byte[] fixedIV
+        - decrypt(String encrypted): String
+        - getUsername(): String
+        - getPassword(): String
+        + translate(String text, String direction): String
+        # translateWord(String word, String sourceLanguage, String targetLanguage, Connection connection): String
+    }
+
+    class EncryptCredentials {
+        - String key
+        - byte[] fixedIV
+        + main(String[] args)
+        - encrypt(String value): String
+    }
+
+    class TranslationException {
+        + TranslationException(String message)
+    }
+
+    class AuthenticationException {
+        + AuthenticationException(String message)
+    }
+
+    class Database {
+        - String URL
+        - String encryptedUsername
+        - String encryptedPassword
+        - String key
+        - byte[] fixedIV
+        - decrypt(String encrypted): String
+        - getUsername(): String
+        - getPassword(): String
+        + getConnection(): Connection
+    }
+
+    class CrudOperations {
+        + addTranslation(String englishWord, String germanWord)
+        + updateTranslation(int id, String englishWord, String germanWord)
+        + deleteTranslation(int id)
+    }
+
+    class TranslatorGUI {
+        - JLabel inputLabel
+        - JTextField inputTextField
+        - JLabel outputLabel
+        - JTextField outputTextField
+        - JLabel directionLabel
+        - JComboBox<String> directionComboBox
+        - JButton translateButton
+        - JButton addButton
+        - JButton updateButton
+        - JButton deleteButton
+        - CrudOperations translationDAO
+        + TranslatorGUI()
+        - getSelectedTranslationId(): int
+        - getUpdatedEnglishWord(): String
+        - getUpdatedGermanWord(): String
+        + actionPerformed(ActionEvent e): void
+        + translateText(String text): String
+        + translateWord(String word, String sourceLanguage, String targetLanguage, Connection connection): String
+    }
+
+    class EnglishToGerman {
+        + translateFromEnglishToGerman(String englishWord): String
+    }
+
+    class GermanToEnglish {
+        + translateFromGermanToEnglish(String germanWord): String
+    }
+
+    class LoginForm {
+        - JTextField usernameField
+        - JPasswordField passwordField
+        - JButton loginButton
+        - JButton signUpButton
+        - Connection connection
+        - String username
+        - String password
+        + LoginForm(JFrame parent)
+        - authenticate(): boolean
+        - signUp(): boolean
+    }
+}
+
+class Translation {
+    + translate(String text, String direction): String
+}
+
+interface Translation {
+    + translate(String text, String direction): String
+}
+
+Main --> Database
+Translator --> Database
+EncryptCredentials --> Database
+TranslatorGUI --> LoginForm
+LoginForm --> Database
+TranslatorGUI --> CrudOperations
+TranslatorGUI --> Database
+TranslatorGUI --> Translation
+TranslatorGUI --> Translator
+TranslatorGUI --> TranslationException
+TranslatorGUI --> AuthenticationException
+
+@enduml
